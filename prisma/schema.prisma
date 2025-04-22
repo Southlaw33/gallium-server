@@ -10,5 +10,77 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
+  // data
+  id            String  @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+
+  // relationships
+  sessions Session[]
+  accounts Account[]
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email])
+}
+
+model Session {
+  // data
+  id        String   @id
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+
+  // relationships
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // indexes
+  @@index([userId])
+}
+
+model Account {
+  // data
+  id                    String    @id
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  // relationships
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // indexes
+  @@index([userId])
+}
+
+model Verification {
+  // data
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
